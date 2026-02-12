@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Luxor: The Golden Champion</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Philosopher:wght@400;700&display=swap');
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background: #000;
+            font-family: 'Philosopher', sans-serif;
+            cursor: crosshair;
+        }
+
+        .tomb {
+            position: relative; width: 100vw; height: 100vh;
+            background: 
+                radial-gradient(circle, rgba(42, 31, 5, 0.4) 0%, rgba(0, 0, 0, 0.9) 100%),
+                url('2.png') center/cover no-repeat;
+            display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        #custom-cursor {
+            position: fixed; width: 20px; height: 20px;
+            border: 2px solid #ffd700; border-radius: 50%;
+            pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px #ffd700;
+        }
+
+        .overlay-screen {
+            position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.95); 
+            display: flex; z-index: 5000; 
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        /* Анимация плавного затяжного появления */
+        .victory-fade-in {
+            animation: longFade 2.5s ease-out forwards;
+        }
+
+        @keyframes longFade {
+            0% { opacity: 0; transform: scale(0.9); filter: blur(10px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+
+        .gold-text {
+            font-family: 'Cinzel Decorative'; 
+            color: #ffd700; font-size: 60px; text-align: center;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+            margin-bottom: 40px;
+        }
+
+        .game-btn {
+            padding: 22px 90px; 
+            background: linear-gradient(#ffd700, #b8860b);
+            border: 3px solid #5c4306; border-radius: 15px;
+            font-family: 'Cinzel Decorative'; font-size: 24px; 
+            color: #1a1403; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 10px 0 #5c4306; text-transform: uppercase;
+        }
+        .game-btn:active { transform: translateY(5px); box-shadow: 0 5px 0 #5c4306; }
+
+        .wheel-box { position: relative; width: 480px; height: 480px; }
+        .static-scarab {
+            position: absolute; width: 90px; height: 90px;
+            background: url('1.png') center/contain no-repeat;
+            right: -55px; top: 50%; margin-top: -45px;
+            transform: rotate(-90deg);
+            filter: drop-shadow(0 0 15px #ffd700);
+            z-index: 100; pointer-events: none;
+            animation: pushEffort 1s infinite ease-in-out;
+        }
+        @keyframes pushEffort {
+            0%, 100% { transform: rotate(-90deg) translateX(0); }
+            50% { transform: rotate(-90deg) translateX(-5px); }
+        }
+        .main-wheel {
+            width: 100%; height: 100%; border-radius: 50%;
+            border: 12px solid #8a6d1c; background: rgba(10, 8, 2, 0.95);
+            position: relative; transition: transform 0.2s cubic-bezier(0.1, 0, 0.2, 1);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 0 40px #000;
+        }
+        .word-item {
+            position: absolute; left: 50%; top: 50%; width: 180px;
+            margin-left: -215px; transform-origin: 215px center;
+            display: flex; justify-content: flex-start; align-items: center;
+        }
+        .word-text { color: #5a4814; font-size: 20px; font-weight: bold; transition: 0.3s; white-space: nowrap; padding-left: 10px; }
+        .active-word .word-text { color: #fff; font-size: 32px; text-shadow: 0 0 15px #ffd700; }
+
+        .game-layout { display: flex; align-items: center; gap: 80px; z-index: 10; margin-top: 50px; }
+
+        .card-stack { position: relative; width: 450px; height: 180px; perspective: 2000px; }
+        .quest-card {
+            position: absolute; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #d4af37 0%, #a67c00 50%, #5c4306 100%);
+            border: 3px solid #3d2b04; border-radius: 12px;
+            display: flex; justify-content: center; align-items: center;
+            color: #1a1403; font-size: 26px; font-weight: bold; text-align: center; padding: 25px;
+            box-sizing: border-box; box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s;
+        }
+        .card-active { transform: translateZ(0) translateY(0); z-index: 10; border-color: #ffd700; }
+        .card-exit { transform: translate(800px, -400px) rotateX(180deg) rotateY(90deg) scale(0.2) !important; opacity: 0 !important; }
+        .card-shake { animation: shake 0.4s ease-in-out; background: linear-gradient(135deg, #a32a2a, #5c0606) !important; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-15px); } 75% { transform: translateX(15px); } }
+
+        .blank-space { color: #fff; border-bottom: 3px solid #1a1403; margin: 0 10px; min-width: 100px; display: inline-block; }
+
+        #flash-red { position: fixed; inset: 0; pointer-events: none; z-index: 4000; opacity: 0; background: rgba(255, 0, 0, 0.3); }
+        .shock-anim { animation: shockFlash 0.4s ease-out; }
+        @keyframes shockFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+        /* Эффект пыли/искр */
+        .sand-particle {
+            position: fixed; background: #ffd700; border-radius: 50%;
+            pointer-events: none; z-index: 6000; opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="custom-cursor"></div>
+<div id="flash-red"></div>
+
+<div id="start-screen" class="overlay-screen">
+    <div class="gold-text">The Maze <br><span style="font-size: 25px;">of Lost Souls</span></div>
+    <button class="game-btn" onclick="startGame()">Start</button>
+</div>
+
+<div id="victory-screen" class="overlay-screen" style="display: none;">
+    <div class="gold-text">ALL TEN SEALS ARE BROKEN!<br><span style="font-size: 25px;">THE MAZE HAS REVEALED THE PATH!</span></div>
+    <button class="game-btn" onclick="resetGame()">Play Again</button>
+</div>
+
+<div class="tomb" id="game-view">
+    <div class="progress-container" id="progress-bar" style="position: absolute; top: 40px; display: flex; gap: 8px;"></div>
+
+    <div class="game-layout">
+        <div class="card-stack" id="deck"></div>
+        <div style="font-size: 50px; color: #ffd700; filter: drop-shadow(0 0 10px #ffd700);">➔</div>
+        
+        <div class="wheel-box">
+            <div class="main-wheel" id="wheel-inner"></div>
+            <div class="static-scarab"></div>
+        </div>
+    </div>
+
+    <button class="game-btn" id="unlock-btn" style="margin-top: 50px;">Activate Seal</button>
+</div>
+
+<script>
+    const sndCorrect = new Audio('1.mp3');
+    const sndWrong = new Audio('2.mp3');
+    const sndTick = new Audio('3.mp3');
+    const sndVictory = new Audio('4.mp3');
+
+    const cursor = document.getElementById('custom-cursor');
+    const wheel = document.getElementById('wheel-inner');
+    const deck = document.getElementById('deck');
+    const flashRed = document.getElementById('flash-red');
+    const unlockBtn = document.getElementById('unlock-btn');
+    const gameView = document.getElementById('game-view');
+    const startScreen = document.getElementById('start-screen');
+    const victoryScreen = document.getElementById('victory-screen');
+
+    // РОСЛОВНО 10 ВОПРОСОВ
+    const grammarData = [
+    { q: "The Sphinx ___ a lion body.", a: "has got" },
+    { q: "There ___ many secrets in Egypt.", a: "are" },
+    { q: "___ you see the golden light?", a: "can" },
+    { q: "The Nile ___ a very long river.", a: "is" },
+    { q: "The priests ___ magic scrolls.", a: "have got" },
+    { q: "Ra is ___ than the serpent.", a: "stronger" },
+    { q: "The maze ___ ten magic seals.", a: "has got" },
+    { q: "Ancient pyramids ___ very old.", a: "are" },
+    { q: "A pharaoh ___ a gold mask.", a: "has got" },
+    { q: "___ the gates open now?", a: "can" }
+    ];
+
+    const options = ["am", "stronger", "is", "are", "isn't", "aren't", "have got", "has got", "haven't got", "hasn't got", "can", "can't"];
+    let currentQuestIdx = 0;
+    let totalRotation = 0;
+    const step = 360 / options.length;
+
+    function startGame() {
+        startScreen.style.display = 'none';
+        gameView.style.display = 'flex';
+        init();
+    }
+
+    function init() {
+        const progBar = document.getElementById('progress-bar');
+        progBar.innerHTML = '';
+        deck.innerHTML = '';
+        wheel.innerHTML = '';
+        
+        // 10 слотов прогрессбара
+        grammarData.forEach(() => {
+            const slot = document.createElement('div');
+            slot.style.cssText = "width: 35px; height: 35px; border: 2px solid #d4af37; border-radius: 6px; background: rgba(10, 8, 2, 0.8); position: relative; overflow: hidden;";
+            slot.innerHTML = '<div class="prog-fill" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: linear-gradient(to top, #8a6d1c, #ffd700); transition: height 0.6s;"></div>';
+            progBar.appendChild(slot);
+        });
+
+        for (let i = grammarData.length - 1; i >= 0; i--) {
+            const card = document.createElement('div');
+            card.className = 'quest-card';
+            card.id = `card-${i}`;
+            card.innerHTML = grammarData[i].q.replace("___", `<span class="blank-space">?</span>`);
+            deck.appendChild(card);
+        }
+
+        options.forEach((opt, i) => {
+            const container = document.createElement('div');
+            container.className = 'word-item';
+            container.style.transform = `rotate(${i * step}deg)`;
+            container.innerHTML = `<div class="word-text">${opt}</div>`;
+            wheel.appendChild(container);
+        });
+        updateWordsOrientation();
+        updateStackStyles();
+    }
+
+    function spawnSand() {
+        for(let i=0; i<60; i++) {
+            const p = document.createElement('div');
+            p.className = 'sand-particle';
+            const size = Math.random() * 4 + 2;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = '50%';
+            p.style.top = '50%';
+            document.body.appendChild(p);
+            
+            const tx = (Math.random() - 0.5) * window.innerWidth;
+            const ty = (Math.random() - 0.5) * window.innerHeight;
+            
+            p.animate([
+                { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: 2000 + Math.random() * 1000,
+                easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+            }).onfinish = () => p.remove();
+        }
+    }
+
+    function updateStackStyles() {
+        const cards = Array.from(document.querySelectorAll('.quest-card:not(.card-exit)'));
+        cards.forEach((card, i) => {
+            card.classList.remove('card-active');
+            if (i === cards.length - 1) card.classList.add('card-active');
+        });
+    }
+
+    function playTick() {
+        const clone = sndTick.cloneNode();
+        clone.volume = 0.3;
+        clone.play();
+    }
+
+    function updateWordsOrientation() {
+        const nodes = document.querySelectorAll('.word-item');
+        let normalized = ((-totalRotation % 360) + 360) % 360;
+        let activeIdx = Math.round(normalized / step) % options.length;
+        nodes.forEach((node, i) => {
+            node.querySelector('.word-text').style.transform = `rotate(${- (i * step) - totalRotation}deg)`;
+            node.classList.toggle('active-word', i === activeIdx);
+        });
+    }
+
+    window.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+    });
+
+    window.addEventListener('wheel', (e) => {
+        if (gameView.style.display === 'none') return;
+        totalRotation += e.deltaY > 0 ? -step : step;
+        wheel.style.transform = `rotate(${totalRotation}deg)`;
+        playTick();
+        updateWordsOrientation();
+    });
+
+    unlockBtn.addEventListener('click', () => {
+        let normalized = ((-totalRotation % 360) + 360) % 360;
+        let selIdx = Math.round(normalized / step) % options.length;
+        let chosen = options[selIdx];
+        
+        const activeCard = document.getElementById(`card-${currentQuestIdx}`);
+        if (!activeCard) return;
+
+        if (chosen === grammarData[currentQuestIdx].a) {
+            sndCorrect.play();
+            activeCard.querySelector('.blank-space').innerText = chosen;
+            activeCard.classList.add('card-exit');
+            const fills = document.querySelectorAll('.prog-fill');
+            if(fills[currentQuestIdx]) fills[currentQuestIdx].style.height = '100%';
+            
+            setTimeout(() => {
+                currentQuestIdx++;
+                updateStackStyles();
+                if (currentQuestIdx >= grammarData.length) {
+                    // Конечная заставка
+                    sndVictory.play();
+                    victoryScreen.style.display = 'flex';
+                    victoryScreen.classList.add('victory-fade-in');
+                    spawnSand();
+                }
+            }, 400);
+        } else {
+            sndWrong.play();
+            activeCard.classList.add('card-shake');
+            flashRed.classList.add('shock-anim');
+            setTimeout(() => {
+                activeCard.classList.remove('card-shake');
+                flashRed.classList.remove('shock-anim');
+            }, 400);
+        }
+    });
+
+    function resetGame() {
+        currentQuestIdx = 0;
+        totalRotation = 0;
+        wheel.style.transform = `rotate(0deg)`;
+        victoryScreen.style.display = 'none';
+        victoryScreen.classList.remove('victory-fade-in');
+        startGame();
+    }
+</script>
+</body>
+</html>
