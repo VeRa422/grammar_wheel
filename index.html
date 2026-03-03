@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Luxor: The Golden Champion</title>
+    <title>Luxor: The Maze of Lost Souls</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Philosopher:wght@400;700&display=swap');
 
@@ -13,6 +13,7 @@
             cursor: crosshair;
         }
 
+        /* Фоновое изображение лабиринта */
         .tomb {
             position: relative; width: 100vw; height: 100vh;
             background: 
@@ -32,12 +33,11 @@
 
         .overlay-screen {
             position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.95); 
+            background: rgba(0,0,0,0.85); 
             display: flex; z-index: 5000; 
             flex-direction: column; justify-content: center; align-items: center;
         }
 
-        /* Анимация плавного затяжного появления */
         .victory-fade-in {
             animation: longFade 2.5s ease-out forwards;
         }
@@ -49,26 +49,28 @@
 
         .gold-text {
             font-family: 'Cinzel Decorative'; 
-            color: #ffd700; font-size: 60px; text-align: center;
+            color: #ffd700; font-size: 50px; text-align: center;
             text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
             margin-bottom: 40px;
         }
 
+        /* Кнопки */
         .game-btn {
-            padding: 22px 90px; 
+            padding: 18px 60px; 
             background: linear-gradient(#ffd700, #b8860b);
-            border: 3px solid #5c4306; border-radius: 15px;
-            font-family: 'Cinzel Decorative'; font-size: 24px; 
+            border: 3px solid #5c4306; border-radius: 12px;
+            font-family: 'Cinzel Decorative'; font-size: 20px; 
             color: #1a1403; cursor: pointer; transition: 0.2s;
-            box-shadow: 0 10px 0 #5c4306; text-transform: uppercase;
+            box-shadow: 0 8px 0 #5c4306; text-transform: uppercase;
         }
-        .game-btn:active { transform: translateY(5px); box-shadow: 0 5px 0 #5c4306; }
+        .game-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 #5c4306; }
 
-        .wheel-box { position: relative; width: 480px; height: 480px; }
+        /* Колесо */
+        .wheel-box { position: relative; width: 440px; height: 440px; }
         .static-scarab {
-            position: absolute; width: 90px; height: 90px;
+            position: absolute; width: 80px; height: 80px;
             background: url('1.png') center/contain no-repeat;
-            right: -55px; top: 50%; margin-top: -45px;
+            right: -50px; top: 50%; margin-top: -40px;
             transform: rotate(-90deg);
             filter: drop-shadow(0 0 15px #ffd700);
             z-index: 100; pointer-events: none;
@@ -80,46 +82,54 @@
         }
         .main-wheel {
             width: 100%; height: 100%; border-radius: 50%;
-            border: 12px solid #8a6d1c; background: rgba(10, 8, 2, 0.95);
+            border: 10px solid #8a6d1c; background: rgba(10, 8, 2, 0.95);
             position: relative; transition: transform 0.2s cubic-bezier(0.1, 0, 0.2, 1);
-            box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 0 40px #000;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 30px #000;
         }
         .word-item {
-            position: absolute; left: 50%; top: 50%; width: 180px;
-            margin-left: -215px; transform-origin: 215px center;
+            position: absolute; left: 50%; top: 50%; width: 170px;
+            margin-left: -200px; transform-origin: 200px center;
             display: flex; justify-content: flex-start; align-items: center;
         }
-        .word-text { color: #5a4814; font-size: 20px; font-weight: bold; transition: 0.3s; white-space: nowrap; padding-left: 10px; }
-        .active-word .word-text { color: #fff; font-size: 32px; text-shadow: 0 0 15px #ffd700; }
+        .word-text { color: #5a4814; font-size: 18px; font-weight: bold; transition: 0.3s; white-space: nowrap; }
+        .active-word .word-text { color: #fff; font-size: 28px; text-shadow: 0 0 15px #ffd700; }
 
-        .game-layout { display: flex; align-items: center; gap: 80px; z-index: 10; margin-top: 50px; }
-
-        .card-stack { position: relative; width: 450px; height: 180px; perspective: 2000px; }
+        /* Карточки */
+        .game-layout { display: flex; align-items: center; gap: 60px; z-index: 10; margin-top: 30px; }
+        .card-stack { position: relative; width: 420px; height: 160px; perspective: 1500px; }
         .quest-card {
             position: absolute; width: 100%; height: 100%;
             background: linear-gradient(135deg, #d4af37 0%, #a67c00 50%, #5c4306 100%);
             border: 3px solid #3d2b04; border-radius: 12px;
             display: flex; justify-content: center; align-items: center;
-            color: #1a1403; font-size: 26px; font-weight: bold; text-align: center; padding: 25px;
-            box-sizing: border-box; box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-            transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s;
+            color: #1a1403; font-size: 22px; font-weight: bold; text-align: center; padding: 20px;
+            box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.4s;
         }
         .card-active { transform: translateZ(0) translateY(0); z-index: 10; border-color: #ffd700; }
-        .card-exit { transform: translate(800px, -400px) rotateX(180deg) rotateY(90deg) scale(0.2) !important; opacity: 0 !important; }
-        .card-shake { animation: shake 0.4s ease-in-out; background: linear-gradient(135deg, #a32a2a, #5c0606) !important; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-15px); } 75% { transform: translateX(15px); } }
+        .card-exit { transform: translate(600px, -300px) rotate(45deg); opacity: 0 !important; }
+        .card-shake { animation: shake 0.4s; background: linear-gradient(135deg, #a32a2a, #5c0606) !important; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
 
-        .blank-space { color: #fff; border-bottom: 3px solid #1a1403; margin: 0 10px; min-width: 100px; display: inline-block; }
+        .blank-space { color: #fff; border-bottom: 2px solid #1a1403; margin: 0 8px; min-width: 80px; display: inline-block; }
 
-        #flash-red { position: fixed; inset: 0; pointer-events: none; z-index: 4000; opacity: 0; background: rgba(255, 0, 0, 0.3); }
-        .shock-anim { animation: shockFlash 0.4s ease-out; }
-        @keyframes shockFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
-
-        /* Эффект пыли/искр */
-        .sand-particle {
-            position: fixed; background: #ffd700; border-radius: 50%;
-            pointer-events: none; z-index: 6000; opacity: 0;
+        /* Управление звуком */
+        .audio-control {
+            position: absolute; top: 20px; right: 20px;
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(0,0,0,0.6); padding: 10px 15px;
+            border-radius: 30px; border: 1px solid #8a6d1c; z-index: 1000;
         }
+        .audio-control label { color: #ffd700; font-size: 12px; font-family: 'Cinzel Decorative'; }
+        input[type=range] {
+            cursor: pointer; accent-color: #ffd700; width: 80px;
+        }
+
+        /* Эффекты */
+        #flash-red { position: fixed; inset: 0; pointer-events: none; z-index: 4000; opacity: 0; background: rgba(255, 0, 0, 0.2); }
+        .shock-anim { animation: shock 0.4s; }
+        @keyframes shock { 0% { opacity: 1; } 100% { opacity: 0; } }
+        .sand-particle { position: fixed; background: #ffd700; border-radius: 50%; pointer-events: none; z-index: 6000; }
     </style>
 </head>
 <body>
@@ -127,22 +137,28 @@
 <div id="custom-cursor"></div>
 <div id="flash-red"></div>
 
+<div class="audio-control">
+    <label>Volume</label>
+    <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5">
+</div>
+
 <div id="start-screen" class="overlay-screen">
-    <div class="gold-text">The Maze <br><span style="font-size: 25px;">of Lost Souls</span></div>
-    <button class="game-btn" onclick="startGame()">Start</button>
+    <button class="game-btn" onclick="startGame()">Enter the Maze</button>
 </div>
 
 <div id="victory-screen" class="overlay-screen" style="display: none;">
-    <div class="gold-text">ALL TEN SEALS ARE BROKEN!<br><span style="font-size: 25px;">THE MAZE HAS REVEALED THE PATH!</span></div>
-    <button class="game-btn" onclick="resetGame()">Play Again</button>
+    <div class="gold-text">ALL SEALS ARE BROKEN!<br>
+        <span style="font-size: 20px;">The way to the Sphinx's Chamber is open.</span>
+    </div>
+    <button class="game-btn" onclick="resetGame()">Continue Journey</button>
 </div>
 
 <div class="tomb" id="game-view">
-    <div class="progress-container" id="progress-bar" style="position: absolute; top: 40px; display: flex; gap: 8px;"></div>
+    <div id="progress-bar" style="position: absolute; top: 40px; display: flex; gap: 12px;"></div>
 
     <div class="game-layout">
         <div class="card-stack" id="deck"></div>
-        <div style="font-size: 50px; color: #ffd700; filter: drop-shadow(0 0 10px #ffd700);">➔</div>
+        <div style="font-size: 40px; color: #ffd700; filter: drop-shadow(0 0 10px #ffd700);">➔</div>
         
         <div class="wheel-box">
             <div class="main-wheel" id="wheel-inner"></div>
@@ -150,7 +166,7 @@
         </div>
     </div>
 
-    <button class="game-btn" id="unlock-btn" style="margin-top: 50px;">Activate Seal</button>
+    <button class="game-btn" id="unlock-btn" style="margin-top: 40px;">Activate Seal</button>
 </div>
 
 <script>
@@ -159,6 +175,7 @@
     const sndTick = new Audio('3.mp3');
     const sndVictory = new Audio('4.mp3');
 
+    const volSlider = document.getElementById('vol-slider');
     const cursor = document.getElementById('custom-cursor');
     const wheel = document.getElementById('wheel-inner');
     const deck = document.getElementById('deck');
@@ -168,24 +185,34 @@
     const startScreen = document.getElementById('start-screen');
     const victoryScreen = document.getElementById('victory-screen');
 
-    // РОСЛОВНО 10 ВОПРОСОВ
     const grammarData = [
-    { q: "The Sphinx ___ a lion body.", a: "has got" },
-    { q: "There ___ many secrets in Egypt.", a: "are" },
-    { q: "___ you see the golden light?", a: "can" },
-    { q: "The Nile ___ a very long river.", a: "is" },
-    { q: "The priests ___ magic scrolls.", a: "have got" },
-    { q: "Ra is ___ than the serpent.", a: "stronger" },
-    { q: "The maze ___ ten magic seals.", a: "has got" },
-    { q: "Ancient pyramids ___ very old.", a: "are" },
-    { q: "A pharaoh ___ a gold mask.", a: "has got" },
-    { q: "___ the gates open now?", a: "can" }
+        { q: "The Sphinx ___ a lion body.", a: "has got" },
+        { q: "There ___ many secrets in Egypt.", a: "are" },
+        { q: "___ you see the golden light?", a: "can" },
+        { q: "The Nile ___ a very long river.", a: "is" },
+        { q: "The priests ___ magic scrolls.", a: "have got" },
+        { q: "Ra is ___ than the serpent.", a: "stronger" },
+        { q: "The maze ___ ten magic seals.", a: "has got" },
+        { q: "Ancient pyramids ___ very old.", a: "are" },
+        { q: "A pharaoh ___ a gold mask.", a: "has got" },
+        { q: "___ the gates open now?", a: "can" }
     ];
 
     const options = ["am", "stronger", "is", "are", "isn't", "aren't", "have got", "has got", "haven't got", "hasn't got", "can", "can't"];
     let currentQuestIdx = 0;
     let totalRotation = 0;
     const step = 360 / options.length;
+
+    // Управление громкостью
+    function updateVolume() {
+        const v = volSlider.value;
+        sndCorrect.volume = v;
+        sndWrong.volume = v;
+        sndTick.volume = v * 0.4;
+        sndVictory.volume = v;
+    }
+    volSlider.addEventListener('input', updateVolume);
+    updateVolume();
 
     function startGame() {
         startScreen.style.display = 'none';
@@ -199,14 +226,15 @@
         deck.innerHTML = '';
         wheel.innerHTML = '';
         
-        // 10 слотов прогрессбара
-        grammarData.forEach(() => {
+        // Создаем слоты для печатей (3.png)
+        grammarData.forEach((_, i) => {
             const slot = document.createElement('div');
-            slot.style.cssText = "width: 35px; height: 35px; border: 2px solid #d4af37; border-radius: 6px; background: rgba(10, 8, 2, 0.8); position: relative; overflow: hidden;";
-            slot.innerHTML = '<div class="prog-fill" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: linear-gradient(to top, #8a6d1c, #ffd700); transition: height 0.6s;"></div>';
+            slot.style.cssText = "width: 45px; height: 45px; border: 1px solid rgba(212,175,55,0.4); border-radius: 50%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;";
+            slot.innerHTML = `<img src="3.png" id="seal-${i}" style="width: 80%; opacity: 0; transition: 0.5s; filter: drop-shadow(0 0 5px gold);">`;
             progBar.appendChild(slot);
         });
 
+        // Карточки
         for (let i = grammarData.length - 1; i >= 0; i--) {
             const card = document.createElement('div');
             card.className = 'quest-card';
@@ -215,6 +243,7 @@
             deck.appendChild(card);
         }
 
+        // Колесо
         options.forEach((opt, i) => {
             const container = document.createElement('div');
             container.className = 'word-item';
@@ -226,42 +255,12 @@
         updateStackStyles();
     }
 
-    function spawnSand() {
-        for(let i=0; i<60; i++) {
-            const p = document.createElement('div');
-            p.className = 'sand-particle';
-            const size = Math.random() * 4 + 2;
-            p.style.width = size + 'px';
-            p.style.height = size + 'px';
-            p.style.left = '50%';
-            p.style.top = '50%';
-            document.body.appendChild(p);
-            
-            const tx = (Math.random() - 0.5) * window.innerWidth;
-            const ty = (Math.random() - 0.5) * window.innerHeight;
-            
-            p.animate([
-                { transform: 'translate(0,0) scale(1)', opacity: 1 },
-                { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
-            ], {
-                duration: 2000 + Math.random() * 1000,
-                easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
-            }).onfinish = () => p.remove();
-        }
-    }
-
     function updateStackStyles() {
         const cards = Array.from(document.querySelectorAll('.quest-card:not(.card-exit)'));
         cards.forEach((card, i) => {
             card.classList.remove('card-active');
             if (i === cards.length - 1) card.classList.add('card-active');
         });
-    }
-
-    function playTick() {
-        const clone = sndTick.cloneNode();
-        clone.volume = 0.3;
-        clone.play();
     }
 
     function updateWordsOrientation() {
@@ -283,7 +282,9 @@
         if (gameView.style.display === 'none') return;
         totalRotation += e.deltaY > 0 ? -step : step;
         wheel.style.transform = `rotate(${totalRotation}deg)`;
-        playTick();
+        const tick = sndTick.cloneNode();
+        tick.volume = volSlider.value * 0.3;
+        tick.play();
         updateWordsOrientation();
     });
 
@@ -299,18 +300,18 @@
             sndCorrect.play();
             activeCard.querySelector('.blank-space').innerText = chosen;
             activeCard.classList.add('card-exit');
-            const fills = document.querySelectorAll('.prog-fill');
-            if(fills[currentQuestIdx]) fills[currentQuestIdx].style.height = '100%';
             
+            // Проявляем печать
+            const seal = document.getElementById(`seal-${currentQuestIdx}`);
+            if(seal) { seal.style.opacity = "1"; seal.style.transform = "scale(1.2)"; setTimeout(()=>seal.style.transform="scale(1)", 300); }
+
             setTimeout(() => {
                 currentQuestIdx++;
                 updateStackStyles();
                 if (currentQuestIdx >= grammarData.length) {
-                    // Конечная заставка
                     sndVictory.play();
                     victoryScreen.style.display = 'flex';
                     victoryScreen.classList.add('victory-fade-in');
-                    spawnSand();
                 }
             }, 400);
         } else {
@@ -325,12 +326,9 @@
     });
 
     function resetGame() {
-        currentQuestIdx = 0;
-        totalRotation = 0;
-        wheel.style.transform = `rotate(0deg)`;
-        victoryScreen.style.display = 'none';
-        victoryScreen.classList.remove('victory-fade-in');
-        startGame();
+        // Здесь можно добавить переход на другой HTML файл или слайд:
+        // window.location.href = "sphinx.html";
+        location.reload(); 
     }
 </script>
 </body>
